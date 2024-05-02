@@ -37,3 +37,8 @@
 | NAMESPACE | METHOD | ROUTE | FUNCTIONALITY |REQUIRE|
 | --------- | -------| ----- | ------------- |---------------- |
 | NOTIFICATION | *GET* | ```v1/notification``` | _GET ALL NOTIFICATION_ || 
+
+## Note 
+- To use `docker-compose` you must fill in POSTGRES_USER, POSTGRES_DB and POSTGRES_PASSWORD in postgres service and DATABASE_URL (like postgres://{db_user_name}:{db_user_password}@db:5432/{db_name} ) in other service 
+
+- API gateway config in api/gate-way/config.toml
