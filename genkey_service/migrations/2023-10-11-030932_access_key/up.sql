@@ -1,0 +1,6 @@
+-- Your SQL goes here
+CREATE TABLE IF NOT EXISTS access_key (
+    id INT NOT NULL GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    token TEXT NOT NULL,
+    permission TEXT [] NOT NULL
+);
