@@ -1,0 +1,115 @@
+version: "3.1"
+
+services:
+    db:
+        environment:
+            POSTGRES_USER: ""
+            POSTGRES_DB: ""
+            POSTGRES_PASSWORD: ""
+        image: postgres:alpine
+        ports: 
+            - 5433:5432
+        networks:
+            test:
+    kafka:
+        image: confluentinc/cp-kafka:${CONFLUENT_VERSION:-5.3.1}
+        environment:
+            - KAFKA_BROKER_ID=0
+            - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+            - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+            - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+            - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
+            - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
+            - KAFKA_NUM_PARTITIONS=3
+            - CONFLUENT_SUPPORT_METRICS_ENABLE=0
+            - KAFKA_CREATE_TOPICS = "posts"
+        ports: 
+            - "29092:29092"
+            - "9092:9092"
+        links: [zookeeper]
+        networks:
+            test:
+                ipv4_address: 172.20.0.10
+    zookeeper:
+        image: confluentinc/cp-zookeeper:${CONFLUENT_VERSION:-5.3.1}
+        environment:
+        - ZOOKEEPER_CLIENT_PORT=2181
+        ports: ["2181:2181"]
+        networks:
+            test:
+                ipv4_address: 172.20.0.11
+    api-gateway:
+        image: nothung209/api-gateway
+        # command: 'bash -c "./wait-for-it.sh db:5432 -q -- diesel setup && cargo watch -x run"'
+        ports:
+            - 8080:8080
+        depends_on:
+            - db    
+        restart: always
+        environment: 
+            - DATABASE_URL=
+        networks:
+            test:
+                ipv4_address: 172.20.0.5
+    auth-service:
+        image: nothung209/auth_service
+        ports:
+            - 8082:8082
+        depends_on:
+            - db    
+        restart: always
+        environment: 
+            - DATABASE_URL=
+        networks:
+            test:
+                ipv4_address: 172.20.0.3
+    user-service:
+        image: nothung209/user_service 
+        ports:
+            - 8081:8081
+        depends_on:
+            - db    
+        restart: always
+        environment: 
+            - DATABASE_URL=
+        networks:
+            test:
+                ipv4_address: 172.20.0.4
+    post-service:
+        image: nothung209/post_service
+        ports:
+            - 8084:8084
+        depends_on:
+            - db    
+            - kafka
+        restart: always
+        environment: 
+            - DATABASE_URL=
+            - KAFKA_URL=kafka:29092
+        networks:
+            test:
+                ipv4_address: 172.20.0.7
+    notification-service:
+        image: nothung209/notification_service 
+        ports:
+            - 8083:8083
+        depends_on:
+            - db    
+            - kafka
+            - post-service
+        restart: always
+        environment: 
+            - DATABASE_URL=
+            - KAFKA_URL=172.20.0.10:29092
+        networks:
+            test:
+                ipv4_address: 172.20.0.8
+    
+networks:
+  test:
+    driver: bridge
+    ipam:
+     config:
+        - subnet: 172.20.0.0/24
+          gateway: 172.20.0.1
