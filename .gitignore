@@ -1,0 +1,10 @@
+*/target
+*private_key*
+.env
+Cargo.lock
+.vscode
+test*
+*.sh
+*.py
+*.txt
+*private*
