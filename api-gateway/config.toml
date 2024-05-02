@@ -1,0 +1,50 @@
+authorization_api_url = "https://127.0.0.1/v1/auth/"
+
+[[services]]
+path = "^/v1/auth"
+target_service = "http://172.20.0.3"
+target_port = "8082"
+authentication_required = false
+ratelimit_required = false
+
+[[services]]
+path = "^/v1/user"
+target_service = "http://172.20.0.4"
+target_port = "8081"
+authentication_required = true
+ratelimit_required = true
+
+[[services]]
+path = "^/v1/user_department"
+target_service = "http://172.20.0.4"
+target_port = "8081"
+authentication_required = true
+ratelimit_required = true
+
+[[services]]
+path = "^/v1/department"
+target_service = "http://172.20.0.4"
+target_port = "8081"
+authentication_required = true
+ratelimit_required = true
+
+[[services]]
+path = "^/v1/group"
+target_service = "http://172.20.0.4"
+target_port = "8081"
+authentication_required = true
+ratelimit_required = true
+
+[[services]]
+path = "^/v1/notification"
+target_service = "http://172.20.0.8"
+target_port = "8083"
+authentication_required = true
+ratelimit_required = true
+
+[[services]]
+path = "^/v1/post"
+target_service = "http://172.20.0.7"
+target_port = "8084"
+authentication_required = true
+ratelimit_required = true
